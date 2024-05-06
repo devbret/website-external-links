@@ -1,6 +1,6 @@
 # Mapping A Website's External Links
 
-![Preview Of Resulting Visualization](https://hosting.photobucket.com/images/i/bernhoftbret/external-links.png)
+![Preview Of Resulting Visualization](https://hosting.photobucket.com/images/i/bernhoftbret/external-links_1pTCsPTZrLadhZaz4FHiUs.png)
 
 Use Python to map a website's external facing links. And then apply D3 to visualize those outbound connections as a network graph.
 
