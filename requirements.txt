@@ -1,0 +1,4 @@
+requests==2.28.0
+beautifulsoup4==4.11.1
+lxml==4.9.1
+textblob==0.17.1
