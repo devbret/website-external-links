@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>External Links Network Graph</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+            .links line {
+                stroke: #999;
+                stroke-opacity: 0.6;
+            }
+            .nodes circle {
+                stroke: #fff;
+                stroke-width: 1.5px;
+            }
+            .text {
+                font-size: 12px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="graph"></div>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script>
+            const width = 960,
+                height = 600;
+
+            const svg = d3
+                .select('#graph')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .call(
+                    d3.zoom().on('zoom', function () {
+                        container.attr('transform', d3.event.transform);
+                    })
+                )
+                .append('g');
+
+            const container = svg.append('g');
+
+            const simulation = d3
+                .forceSimulation()
+                .force(
+                    'link',
+                    d3
+                        .forceLink()
+                        .id((d) => d.id)
+                        .distance(100)
+                )
+                .force('charge', d3.forceManyBody().strength(-400))
+                .force('center', d3.forceCenter(width / 2, height / 2));
+
+            d3.json('external_links.json').then(function (data) {
+                const links = [];
+                const nodes = {};
+
+                Object.keys(data).forEach((target) => {
+                    if (!nodes[target]) {
+                        nodes[target] = { id: target, label: target, type: 'external' };
+                    }
+                    data[target].forEach((source) => {
+                        if (!nodes[source]) {
+                            nodes[source] = { id: source, label: source, type: 'internal' };
+                        }
+                        links.push({ source: source, target: target });
+                    });
+                });
+
+                const graph = {
+                    nodes: Object.values(nodes),
+                    links: links,
+                };
+
+                const link = container
+                    .append('g')
+                    .attr('class', 'links')
+                    .selectAll('line')
+                    .data(graph.links)
+                    .enter()
+                    .append('line')
+                    .style('stroke-width', '3px');
+
+                const node = container
+                    .append('g')
+                    .attr('class', 'nodes')
+                    .selectAll('circle')
+                    .data(graph.nodes)
+                    .enter()
+                    .append('circle')
+                    .attr('r', 5)
+                    .style('fill', (d) => (d.type === 'external' ? 'magenta' : 'aqua'))
+                    .call(d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended));
+
+                const text = container
+                    .append('g')
+                    .attr('class', 'text')
+                    .selectAll('text')
+                    .data(graph.nodes)
+                    .enter()
+                    .append('text')
+                    .text((d) => d.id)
+                    .attr('x', 10)
+                    .attr('y', 3);
+
+                node.append('title').text((d) => d.id);
+
+                simulation.nodes(graph.nodes).on('tick', ticked);
+
+                simulation.force('link').links(graph.links);
+
+                function ticked() {
+                    link.attr('x1', (d) => d.source.x)
+                        .attr('y1', (d) => d.source.y)
+                        .attr('x2', (d) => d.target.x)
+                        .attr('y2', (d) => d.target.y);
+                    node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
+                    text.attr('x', (d) => d.x + 10).attr('y', (d) => d.y + 3);
+                }
+
+                function dragstarted(d) {
+                    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+                    d.fx = d.x;
+                    d.fy = d.y;
+                }
+
+                function dragged(d) {
+                    d.fx = d3.event.x;
+                    d.fy = d3.event.y;
+                }
+
+                function dragended(d) {
+                    if (!d3.event.active) simulation.alphaTarget(0);
+                    d.fx = null;
+                    d.fy = null;
+                }
+            });
+        </script>
+    </body>
+</html>
