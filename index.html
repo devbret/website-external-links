@@ -21,14 +21,22 @@
             .tooltip {
                 position: absolute;
                 text-align: center;
-                width: auto;
+                max-width: 300px;
                 height: auto;
                 padding: 2px;
-                font-size: 17px;
+                font-size: 14px;
                 background: lightsteelblue;
                 border: 0px;
                 pointer-events: none;
                 opacity: 0;
+                transition: opacity 0.3s;
+            }
+            .highlight {
+                stroke: yellow;
+                stroke-width: 2px;
+            }
+            .dimmed {
+                opacity: 0.1;
             }
         </style>
     </head>
@@ -38,21 +46,20 @@
         <script>
             const width = 1350,
                 height = 875;
-
             const svg = d3
                 .select('#graph')
                 .append('svg')
                 .attr('width', width)
                 .attr('height', height)
                 .call(
-                    d3.zoom().on('zoom', function () {
-                        container.attr('transform', d3.event.transform);
+                    d3.zoom().on('zoom', function (event) {
+                        container.attr('transform', event.transform);
                     })
                 )
                 .append('g');
 
             const container = svg.append('g');
-            const tooltip = d3.select('body').append('div').attr('class', 'tooltip');
+            const tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0);
 
             const simulation = d3
                 .forceSimulation()
@@ -71,21 +78,14 @@
                 const nodes = {};
 
                 Object.keys(data).forEach((target) => {
-                    if (!nodes[target]) {
-                        nodes[target] = { id: target, label: target, type: 'external' };
-                    }
+                    if (!nodes[target]) nodes[target] = { id: target, label: target, type: 'external' };
                     data[target].forEach((source) => {
-                        if (!nodes[source]) {
-                            nodes[source] = { id: source, label: source, type: 'internal' };
-                        }
+                        if (!nodes[source]) nodes[source] = { id: source, label: source, type: 'internal' };
                         links.push({ source: source, target: target });
                     });
                 });
 
-                const graph = {
-                    nodes: Object.values(nodes),
-                    links: links,
-                };
+                const graph = { nodes: Object.values(nodes), links: links };
 
                 const link = container
                     .append('g')
@@ -94,7 +94,8 @@
                     .data(graph.links)
                     .enter()
                     .append('line')
-                    .style('stroke-width', '6px');
+                    .attr('stroke-width', 2)
+                    .attr('stroke', '#ccc');
 
                 const node = container
                     .append('g')
@@ -103,22 +104,47 @@
                     .data(graph.nodes)
                     .enter()
                     .append('circle')
-                    .attr('r', 8)
-                    .style('fill', (d) => (d.type === 'external' ? 'magenta' : 'aqua'))
+                    .attr('r', 10)
+                    .attr('fill', (d) => (d.type === 'external' ? 'magenta' : 'aqua'))
                     .call(d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended))
-                    .on('mouseover', function (d) {
-                        tooltip.transition().duration(200).style('opacity', 0.9);
-                        tooltip
-                            .html(d.id)
-                            .style('left', d3.event.pageX + 'px')
-                            .style('top', d3.event.pageY - 28 + 'px');
-                    })
-                    .on('mouseout', function (d) {
-                        tooltip.transition().duration(500).style('opacity', 0);
-                    });
+                    .on('mouseover', mouseOver)
+                    .on('mouseout', mouseOut)
+                    .on('click', (d) => window.open(d.id, '_blank'));
+
+                const linkedByIndex = {};
+                graph.links.forEach((d) => {
+                    linkedByIndex[d.source.id + ',' + d.target.id] = 1;
+                    linkedByIndex[d.target.id + ',' + d.source.id] = 1;
+                });
+
+                function isConnected(a, b) {
+                    return linkedByIndex[a.id + ',' + b.id] || linkedByIndex[b.id + ',' + a.id] || a.id === b.id;
+                }
+
+                function mouseOver(d) {
+                    tooltip.transition().duration(300).style('opacity', 1);
+                    tooltip
+                        .html(d.id)
+                        .style('left', d3.event.pageX + 5 + 'px')
+                        .style('top', d3.event.pageY - 28 + 'px');
+
+                    node.classed('dimmed', true);
+                    link.classed('dimmed', true);
+                    node.filter((n) => n === d || links.some((l) => (l.source === d && l.target === n) || (l.target === d && l.source === n)))
+                        .classed('dimmed', false)
+                        .classed('highlight', true);
+                    link.filter((l) => l.source === d || l.target === d)
+                        .classed('dimmed', false)
+                        .classed('highlight', true);
+                }
+
+                function mouseOut() {
+                    tooltip.transition().duration(300).style('opacity', 0);
+                    node.classed('dimmed', false).classed('highlight', false);
+                    link.classed('dimmed', false).classed('highlight', false);
+                }
 
                 simulation.nodes(graph.nodes).on('tick', ticked);
-
                 simulation.force('link').links(graph.links);
 
                 function ticked() {
