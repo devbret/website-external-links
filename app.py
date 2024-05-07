@@ -1,8 +1,7 @@
 import requests
-from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
 import json
-import re
 
 def is_external(url, base):
     return urlparse(url).netloc != urlparse(base).netloc
@@ -14,30 +13,23 @@ def crawl_site(start_url, max_links=100):
     def crawl(url):
         if len(visited) >= max_links:
             return
-        if url in visited:
-            return
         visited.add(url)
         print(f"Crawling: {url}")
-
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=5)
             soup = BeautifulSoup(response.text, 'html.parser')
-
-            for link in soup.find_all('a', href=True):
-                href = link.get('href')
-                full_url = urljoin(url, href)
-                if is_external(full_url, start_url):
-                    if full_url not in external_links:
-                        external_links[full_url] = []
-                    external_links[full_url].append(url)
-
         except requests.exceptions.RequestException as e:
             print(f"Failed to crawl {url}: {e}")
+            return
 
         for link in soup.find_all('a', href=True):
-            full_url = urljoin(url, link.get('href'))
-            if not is_external(full_url, start_url) and full_url not in visited:
-                crawl(full_url)
+            href = urljoin(url, link.get('href'))
+            if is_external(href, start_url):
+                if href not in external_links:
+                    external_links[href] = []
+                external_links[href].append(url)
+            elif href not in visited:
+                crawl(href)
 
     crawl(start_url)
     return external_links
