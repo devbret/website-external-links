@@ -21,10 +21,9 @@
             .tooltip {
                 position: absolute;
                 text-align: center;
-                max-width: 300px;
                 height: auto;
                 padding: 2px;
-                font-size: 14px;
+                font-size: 16px;
                 background: lightsteelblue;
                 border: 0px;
                 pointer-events: none;
@@ -42,10 +41,11 @@
     </head>
     <body>
         <div id="graph"></div>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://d3js.org/d3.v6.min.js"></script>
         <script>
             const width = 1350,
                 height = 875;
+
             const svg = d3
                 .select('#graph')
                 .append('svg')
@@ -55,11 +55,10 @@
                     d3.zoom().on('zoom', function (event) {
                         container.attr('transform', event.transform);
                     })
-                )
-                .append('g');
+                );
 
             const container = svg.append('g');
-            const tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0);
+            const tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
 
             const simulation = d3
                 .forceSimulation()
@@ -77,11 +76,16 @@
                 const links = [];
                 const nodes = {};
 
-                Object.keys(data).forEach((target) => {
-                    if (!nodes[target]) nodes[target] = { id: target, label: target, type: 'external' };
-                    data[target].forEach((source) => {
-                        if (!nodes[source]) nodes[source] = { id: source, label: source, type: 'internal' };
-                        links.push({ source: source, target: target });
+                Object.keys(data).forEach((parentUrl) => {
+                    if (!nodes[parentUrl]) {
+                        nodes[parentUrl] = { id: parentUrl, label: parentUrl, type: 'external' };
+                    }
+
+                    data[parentUrl].forEach((childUrl) => {
+                        if (!nodes[childUrl]) {
+                            nodes[childUrl] = { id: childUrl, label: childUrl, type: 'internal', parentUrl: parentUrl };
+                        }
+                        links.push({ source: childUrl, target: parentUrl });
                     });
                 });
 
@@ -109,7 +113,10 @@
                     .call(d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended))
                     .on('mouseover', mouseOver)
                     .on('mouseout', mouseOut)
-                    .on('click', (d) => window.open(d.id, '_blank'));
+                    .on('click', (event, d) => {
+                        const urlToOpen = d.type === 'external' ? d.parentUrl : d.id;
+                        window.open(urlToOpen, '_blank');
+                    });
 
                 const linkedByIndex = {};
                 graph.links.forEach((d) => {
@@ -121,12 +128,12 @@
                     return linkedByIndex[a.id + ',' + b.id] || linkedByIndex[b.id + ',' + a.id] || a.id === b.id;
                 }
 
-                function mouseOver(d) {
+                function mouseOver(event, d) {
                     tooltip.transition().duration(300).style('opacity', 1);
                     tooltip
                         .html(d.id)
-                        .style('left', d3.event.pageX + 5 + 'px')
-                        .style('top', d3.event.pageY - 28 + 'px');
+                        .style('left', event.pageX + 5 + 'px')
+                        .style('top', event.pageY - 28 + 'px');
 
                     node.classed('dimmed', true);
                     link.classed('dimmed', true);
@@ -138,7 +145,7 @@
                         .classed('highlight', true);
                 }
 
-                function mouseOut() {
+                function mouseOut(event, d) {
                     tooltip.transition().duration(300).style('opacity', 0);
                     node.classed('dimmed', false).classed('highlight', false);
                     link.classed('dimmed', false).classed('highlight', false);
@@ -155,19 +162,19 @@
                     node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
                 }
 
-                function dragstarted(d) {
-                    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+                function dragstarted(event, d) {
+                    if (!event.active) simulation.alphaTarget(0.3).restart();
                     d.fx = d.x;
                     d.fy = d.y;
                 }
 
-                function dragged(d) {
-                    d.fx = d3.event.x;
-                    d.fy = d3.event.y;
+                function dragged(event, d) {
+                    d.fx = event.x;
+                    d.fy = event.y;
                 }
 
-                function dragended(d) {
-                    if (!d3.event.active) simulation.alphaTarget(0);
+                function dragended(event, d) {
+                    if (!event.active) simulation.alphaTarget(0);
                     d.fx = null;
                     d.fy = null;
                 }
