@@ -12,11 +12,23 @@
                 stroke-opacity: 0.6;
             }
             .nodes circle {
-                stroke: #fff;
-                stroke-width: 1.5px;
+                stroke: #000;
+                stroke-width: 3px;
             }
             .text {
                 font-size: 12px;
+            }
+            .tooltip {
+                position: absolute;
+                text-align: center;
+                width: auto;
+                height: auto;
+                padding: 2px;
+                font-size: 17px;
+                background: lightsteelblue;
+                border: 0px;
+                pointer-events: none;
+                opacity: 0;
             }
         </style>
     </head>
@@ -24,8 +36,8 @@
         <div id="graph"></div>
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script>
-            const width = 960,
-                height = 600;
+            const width = 1350,
+                height = 875;
 
             const svg = d3
                 .select('#graph')
@@ -40,6 +52,7 @@
                 .append('g');
 
             const container = svg.append('g');
+            const tooltip = d3.select('body').append('div').attr('class', 'tooltip');
 
             const simulation = d3
                 .forceSimulation()
@@ -81,7 +94,7 @@
                     .data(graph.links)
                     .enter()
                     .append('line')
-                    .style('stroke-width', '3px');
+                    .style('stroke-width', '6px');
 
                 const node = container
                     .append('g')
@@ -90,22 +103,19 @@
                     .data(graph.nodes)
                     .enter()
                     .append('circle')
-                    .attr('r', 5)
+                    .attr('r', 8)
                     .style('fill', (d) => (d.type === 'external' ? 'magenta' : 'aqua'))
-                    .call(d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended));
-
-                const text = container
-                    .append('g')
-                    .attr('class', 'text')
-                    .selectAll('text')
-                    .data(graph.nodes)
-                    .enter()
-                    .append('text')
-                    .text((d) => d.id)
-                    .attr('x', 10)
-                    .attr('y', 3);
-
-                node.append('title').text((d) => d.id);
+                    .call(d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended))
+                    .on('mouseover', function (d) {
+                        tooltip.transition().duration(200).style('opacity', 0.9);
+                        tooltip
+                            .html(d.id)
+                            .style('left', d3.event.pageX + 'px')
+                            .style('top', d3.event.pageY - 28 + 'px');
+                    })
+                    .on('mouseout', function (d) {
+                        tooltip.transition().duration(500).style('opacity', 0);
+                    });
 
                 simulation.nodes(graph.nodes).on('tick', ticked);
 
@@ -117,7 +127,6 @@
                         .attr('x2', (d) => d.target.x)
                         .attr('y2', (d) => d.target.y);
                     node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
-                    text.attr('x', (d) => d.x + 10).attr('y', (d) => d.y + 3);
                 }
 
                 function dragstarted(d) {
