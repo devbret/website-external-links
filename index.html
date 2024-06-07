@@ -6,26 +6,29 @@
         <style>
             body {
                 font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
             }
             .links line {
                 stroke: #999;
                 stroke-opacity: 0.6;
+                stroke-width: 2px;
             }
             .nodes circle {
-                stroke: #000;
-                stroke-width: 3px;
+                stroke: #333;
+                stroke-width: 1.5px;
             }
             .text {
                 font-size: 12px;
+                fill: #333;
             }
             .tooltip {
                 position: absolute;
                 text-align: center;
-                height: auto;
-                padding: 2px;
-                font-size: 16px;
-                background: lightsteelblue;
-                border: 0px;
+                padding: 8px;
+                font-size: 14px;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                border-radius: 4px;
                 pointer-events: none;
                 opacity: 0;
                 transition: opacity 0.3s;
@@ -37,10 +40,41 @@
             .dimmed {
                 opacity: 0.1;
             }
+            .legend {
+                position: absolute;
+                right: 10px;
+                bottom: 10px;
+                background: white;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-size: 14px;
+            }
+            .legend-item {
+                display: flex;
+                align-items: center;
+                margin-bottom: 5px;
+            }
+            .legend-color {
+                width: 20px;
+                height: 20px;
+                margin-right: 5px;
+                border: 1px solid #333;
+            }
         </style>
     </head>
     <body>
         <div id="graph"></div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: magenta"></div>
+                External Node
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: aqua"></div>
+                Internal Node
+            </div>
+        </div>
         <script src="https://d3js.org/d3.v6.min.js"></script>
         <script>
             const width = 1350,
@@ -78,7 +112,7 @@
 
                 Object.keys(data).forEach((parentUrl) => {
                     if (!nodes[parentUrl]) {
-                        nodes[parentUrl] = { id: parentUrl, label: parentUrl, type: 'external' };
+                        nodes[parentUrl] = { id: parentUrl, label: parentUrl, type: 'external', parentUrl: parentUrl };
                     }
 
                     data[parentUrl].forEach((childUrl) => {
@@ -99,7 +133,7 @@
                     .enter()
                     .append('line')
                     .attr('stroke-width', 2)
-                    .attr('stroke', '#ccc');
+                    .attr('stroke', (d) => (d.source.type === 'external' ? 'url(#gradient-external)' : 'url(#gradient-internal)'));
 
                 const node = container
                     .append('g')
@@ -115,7 +149,12 @@
                     .on('mouseout', mouseOut)
                     .on('click', (event, d) => {
                         const urlToOpen = d.type === 'external' ? d.parentUrl : d.id;
-                        window.open(urlToOpen, '_blank');
+
+                        if (urlToOpen && isValidURL(urlToOpen)) {
+                            window.open(urlToOpen, '_blank');
+                        } else {
+                            console.error('Invalid URL:', urlToOpen);
+                        }
                     });
 
                 const linkedByIndex = {};
@@ -177,6 +216,15 @@
                     if (!event.active) simulation.alphaTarget(0);
                     d.fx = null;
                     d.fy = null;
+                }
+
+                function isValidURL(string) {
+                    try {
+                        new URL(string);
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
                 }
             });
         </script>
