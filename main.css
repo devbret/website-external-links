@@ -1,0 +1,99 @@
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.links line {
+  stroke: #666;
+  stroke-opacity: 0.7;
+  stroke-width: 2px;
+  transition: stroke 0.2s, stroke-opacity 0.2s;
+}
+
+.nodes circle {
+  stroke: #333;
+  stroke-width: 1.5px;
+  transition: transform 0.3s, stroke-width 0.2s;
+}
+
+.text {
+  font-size: 13px;
+  fill: #444;
+  user-select: none;
+}
+
+.tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(-10px);
+}
+
+.tooltip-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.highlight {
+  stroke: #ffcc00;
+  stroke-width: 2.5px;
+}
+
+.dimmed {
+  opacity: 0.2;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.legend {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  background-color: #ffffff;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  background-color: #ff66b2;
+  border: 1px solid #333;
+  border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .tooltip {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .legend {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .legend-color {
+    width: 15px;
+    height: 15px;
+  }
+}
