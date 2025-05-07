@@ -15,7 +15,7 @@ Use Python to map a website's external facing links. And then apply D3 to visual
 
 1. Install the above programs.
 2. Open a shell window (For Windows open PowerShell, for MacOS open Terminal & for Linux open your distro's terminal emulator).
-3. Clone this repository using `git` by running the following command; `git clone https://github.com/devbret/website-external-links`.
+3. Clone this repository using `git` by running the following command; `git clone git@github.com:devbret/website-external-links.git`.
 4. Navigate to the repo's directory by running; `cd website-external-links`.
 5. Install the needed dependencies for running the script by running; `pip install -r requirements.txt`.
 6. Edit the app.py file on line 51, to include the website that you would like to visualize. You can also change the maximum number of URLs that this program will visit at a given domain, by editing the "max_links" value on line 11 in the app.py file; which is set to 50 by default.
