@@ -1,5 +1,5 @@
-const width = 1900,
-  height = 1000;
+const width = window.innerWidth,
+  height = window.innerHeight;
 
 const svg = d3
   .select("#graph")
@@ -9,7 +9,7 @@ const svg = d3
   .call(
     d3.zoom().on("zoom", function (event) {
       container.attr("transform", event.transform);
-    })
+    }),
   );
 
 const container = svg.append("g");
@@ -27,7 +27,7 @@ const simulation = d3
     d3
       .forceLink()
       .id((d) => d.id)
-      .distance(100)
+      .distance(100),
   )
   .force("charge", d3.forceManyBody().strength(-400))
   .force("center", d3.forceCenter(width / 2, height / 2));
@@ -72,7 +72,7 @@ d3.json("external_links.json").then(function (data) {
     .attr("stroke", (d) =>
       d.source.type === "external"
         ? "url(#gradient-external)"
-        : "url(#gradient-internal)"
+        : "url(#gradient-internal)",
     );
 
   const node = container
@@ -89,7 +89,7 @@ d3.json("external_links.json").then(function (data) {
         .drag()
         .on("start", dragstarted)
         .on("drag", dragged)
-        .on("end", dragended)
+        .on("end", dragended),
     )
     .on("mouseover", mouseOver)
     .on("mouseout", mouseOut)
@@ -119,7 +119,7 @@ d3.json("external_links.json").then(function (data) {
 
   function mouseOver(event, d) {
     const connectedLinks = graph.links.filter(
-      (l) => l.source.id === d.id || l.target.id === d.id
+      (l) => l.source.id === d.id || l.target.id === d.id,
     ).length;
 
     tooltip.transition().duration(300).style("opacity", 1);
@@ -138,8 +138,8 @@ d3.json("external_links.json").then(function (data) {
           links.some(
             (l) =>
               (l.source === d && l.target === n) ||
-              (l.target === d && l.source === n)
-          )
+              (l.target === d && l.source === n),
+          ),
       )
       .classed("dimmed", false)
       .classed("highlight", true);
