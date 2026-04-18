@@ -10,7 +10,7 @@ The Python script recursively crawls a starting URL, records internal pages, col
 
 ## Set Up Instructions
 
-Below are the set up steps and prerequisite software programs needed for this application.
+Below are the set up steps and prerequisite software programs needed for this application to run on a Linux machine.
 
 ### Programs Needed
 
@@ -24,16 +24,33 @@ Below are the set up steps and prerequisite software programs needed for this ap
 
 2. Open a terminal
 
-3. Clone this repository using git by running the following command: `git clone git@github.com:devbret/website-external-links.git`
+3. Clone this repository using `git` by running the following command: `git clone git@github.com:devbret/website-external-links.git`
 
-4. Navigate to the repo's directory by running: `cd website-external-links`
+4. Navigate to the repo's directory: `cd website-external-links`
 
-5. Install the needed dependencies for running the script by running: `pip install -r requirements.txt`
+5. Create a virtual environment: `python3 -m venv venv`
 
-6. Edit the app.py file on line 51 to include the website you would like to visualize
+6. Activate your virtual environment: `source venv/bin/activate`
 
-7. You can also change the maximum number of URLs that this program will visit at a given domain by editing the `max_links` value on line 11 in the app.py file, which is set to 50 by default
+7. Install the needed dependencies for running the script: `pip install -r requirements.txt`
 
-8. Run the script with the command: `python3 app.py`
+8. Edit the `app.py` file on line 51 to include the website you would like to visualize
+   - You can also change the maximum number of URLs visited by editing the `max_links` value on line 11 in the `app.py` file
 
-9. To view the website's connections in the index.html file you will need to run a local web server with: `python3 -m http.server`
+9. Run the script: `python3 app.py`
+
+10. To view the scanned website's connections, you will need to run a local web server: `python3 -m http.server`
+
+11. Exit the virtual environment when finished: `deactivate`
+
+## Other Considerations
+
+This project repo is intended to demonstrate an ability to do the following:
+
+- Crawl a website recursively to map internal pages and extract all external links
+
+- Transform discovered link relationships into structured JSON data and visualize them as an interactive D3.js network graph
+
+- Enable exploration of link connectivity to inspect relationships between internal and external URLs
+
+If you have any questions or would like to collaborate, please reach out either on GitHub or via [my website](https://bretbernhoft.com/).
