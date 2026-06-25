@@ -2,13 +2,15 @@
 
 ![Preview Of Resulting Visualization](https://hosting.photobucket.com/bbcfb0d4-be20-44a0-94dc-65bff8947cf2/e5e2ac60-d42b-49b5-aa69-caddcf013f7b.png)
 
-A lightweight web crawler and interactive network visualizer which maps the relationship between a website’s internal pages and the external links they reference.
+Lightweight web crawler and interactive network visualizer which maps the relationship between a website’s internal pages and the external links they reference.
 
-## Overview
+## Application Overview
 
-The Python script recursively crawls a starting URL, records internal pages, collects external links along with their referring internal pages, logs discoveries to a CSV file with timestamps and exports a JSON file. The JavaScript frontend then loads this JSON file and renders a network graph in which internal and external URLs are represented as color-coded nodes connected by links. With zooming, dragging, highlighting and click-to-open behavior, allowing users to visually explore how a site connects outward to external domains.
+Operates as a two-part system designed to map and visualize the external link architecture of a website. The backend is a Python web crawler which navigates through a starting URL, identifying internal pages and extracting every external link referenced therein. To maintain efficiency, it limits the total number of crawled pages and generates two outputs to map the exact relationships between the internal source pages and their external destinations.
 
-## Set Up Instructions
+The frontend utilizes this data to generate an interactive, network graph using the D3.js library. This UI allows users to explore the site's connectivity by representing URLs as color-coded nodes. Users can interact with the graph by dragging nodes and clicking on individual nodes to open the corresponding web pages in their browser.
+
+## Basic Setup Instructions
 
 Below are the set up steps and prerequisite software programs needed for this application to run on a Linux machine.
 
@@ -24,7 +26,7 @@ Below are the set up steps and prerequisite software programs needed for this ap
 
 2. Open a terminal
 
-3. Clone this repository using `git` by running the following command: `git clone git@github.com:devbret/website-external-links.git`
+3. Clone this repository: `git clone git@github.com:devbret/website-external-links.git`
 
 4. Navigate to the repo's directory: `cd website-external-links`
 
@@ -32,25 +34,30 @@ Below are the set up steps and prerequisite software programs needed for this ap
 
 6. Activate your virtual environment: `source venv/bin/activate`
 
-7. Install the needed dependencies for running the script: `pip install -r requirements.txt`
+7. Install the needed dependencies: `pip install -r requirements.txt`
 
-8. Edit the `app.py` file on line 51 to include the website you would like to visualize
-   - You can also change the maximum number of URLs visited by editing the `max_links` value on line 11 in the `app.py` file
+8. Edit the `app.py` file on line 51 to include target website
 
 9. Run the script: `python3 app.py`
 
-10. To view the scanned website's connections, you will need to run a local web server: `python3 -m http.server`
+10. Start an HTTP server: `python3 -m http.server`
 
-11. Exit the virtual environment when finished: `deactivate`
+11. Visit the application in your browser: `http://localhost:8000`
+
+12. When finished, stop the HTTP server: `Ctrl + C`
+
+13. Exit the virtual environment: `deactivate`
 
 ## Other Considerations
 
 This project repo is intended to demonstrate an ability to do the following:
 
-- Crawl a website recursively to map internal pages and extract all external links
+- Crawl a specified website to identify internal pages and map out all the external links referenced within them
 
-- Transform discovered link relationships into structured JSON data and visualize them as an interactive D3.js network graph
+- Log the crawl data into a CSV file with timestamps and export a structured JSON file mapping external URLs to their internal source pages
 
-- Enable exploration of link connectivity to inspect relationships between internal and external URLs
+- Generate an interactive, network graph where nodes represent URLs color-coded as either internal or external
+
+- Enable users to explore the site's link architecture by zooming, dragging nodes and clicking nodes to open the actual web pages
 
 If you have any questions or would like to collaborate, please reach out either on GitHub or via [my website](https://bretbernhoft.com/).
