@@ -50,6 +50,10 @@ Below are the set up steps and prerequisite software programs needed for this ap
 
 ## Other Considerations
 
+Below you will find information not covered in the installation and use sections above. Including the abilities this repo is intended to demonstrate. As well as an overview of the license this code is made available with. And a way to contact the maintainer with questions, suggestions and collaboration opportunities.
+
+### Abilities Demonstrated
+
 This project repo is intended to demonstrate an ability to do the following:
 
 - Crawl a specified website to identify internal pages and map out all the external links referenced within them
@@ -59,5 +63,9 @@ This project repo is intended to demonstrate an ability to do the following:
 - Generate an interactive, network graph where nodes represent URLs color-coded as either internal or external
 
 - Enable users to explore the site's link architecture by zooming, dragging nodes and clicking nodes to open the actual web pages
+
+### License Information
+
+This repository is distributed under the MIT License. You are free to use, copy, modify, merge, publish, distribute, sublicense and sell copies of this software, including as part of proprietary or commercial work. The single condition is the copyright and permission notices contained in the LICENSE file must be included with any copy or substantial portion of the software that you redistribute. The software is provided "as is", without warranty of any kind, and the copyright holder is not liable for any claim or damages arising from its use.
 
 If you have any questions or would like to collaborate, please reach out either on GitHub or via [my website](https://bretbernhoft.com/).
