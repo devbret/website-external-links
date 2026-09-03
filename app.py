@@ -5,8 +5,14 @@ import json
 import csv
 from datetime import datetime
 
+
+def is_http(url):
+    return urlparse(url).scheme in ('http', 'https')
+
+
 def is_external(url, base):
     return urlparse(url).netloc != urlparse(base).netloc
+
 
 def crawl_site(start_url, max_links=50, csv_filename='discovered_links.csv'):
     visited = set()
@@ -32,6 +38,10 @@ def crawl_site(start_url, max_links=50, csv_filename='discovered_links.csv'):
 
             for link in soup.find_all('a', href=True):
                 href = urljoin(url, link.get('href'))
+                
+                if not is_http(href):
+                    continue
+
                 if is_external(href, start_url):
                     if href not in external_links:
                         external_links[href] = []
@@ -44,9 +54,11 @@ def crawl_site(start_url, max_links=50, csv_filename='discovered_links.csv'):
 
     return external_links
 
+
 def save_links_as_json(external_links, filename='external_links.json'):
     with open(filename, 'w') as file:
         json.dump(external_links, file, indent=2)
+
 
 external_links = crawl_site('https://www.example.com/')
 save_links_as_json(external_links)
