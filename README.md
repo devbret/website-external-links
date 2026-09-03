@@ -36,7 +36,7 @@ Below are the set up steps and prerequisite software programs needed for this ap
 
 7. Install the needed dependencies: `pip install -r requirements.txt`
 
-8. Edit the `app.py` file on line 51 to include target website
+8. Edit the `app.py` file on line 63 to include target website
 
 9. Run the script: `python3 app.py`
 
